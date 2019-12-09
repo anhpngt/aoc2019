@@ -44,4 +44,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser('Solution to day 2\'s problem')
     parser.add_argument('input', help='path to input file')
     args = parser.parse_args()
+
     print('Solution: {}'.format(Solution().solve(args.input)))
