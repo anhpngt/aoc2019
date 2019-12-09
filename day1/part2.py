@@ -26,7 +26,7 @@ class Solution:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Solution to day 2\'s problem of AoC')
+    parser = argparse.ArgumentParser(description='Solution to day 1, part2\'s problem of AoC')
     parser.add_argument('input', help='path to input file')
 
     args = parser.parse_args()
