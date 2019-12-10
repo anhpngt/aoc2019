@@ -2,4 +2,5 @@
 .vscode
 
 # C++ artifacts
-*/build
+build
+debug
