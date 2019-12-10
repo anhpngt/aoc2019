@@ -10,4 +10,4 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 add_definitions(-std=c++14)
 
-add_executable(part1 part1.cc)
+add_executable(solution solution.cc)

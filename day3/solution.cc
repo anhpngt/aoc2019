@@ -8,8 +8,6 @@
 using std::cout;
 using std::endl;
 
-const int INT_MAX = 2147483647;
-
 bool isBetween(int x, int a, int b)
 {
     if (a >= b)
@@ -97,6 +95,11 @@ public:
         this->y = startPoint.y + yOffset;
     }
 
+    int manhattanDistToPoint(const Point &other) const
+    {
+        return abs(this->x - other.x) + abs(this->y - other.y);
+    }
+
     int manhattanDistToOrigin() const
     {
         return abs(this->x) + abs(this->y);
@@ -120,11 +123,13 @@ class Line
 public:
     Point start, end;
     bool isHorizontal;
+    int length;
 
     Line(const Point &startPoint, const Path &path)
     {
         this->start = startPoint;
         this->end = Point(startPoint, path);
+        this->length = path.distance;
         this->isHorizontal = path.direction == 'R' || path.direction == 'L';
     }
 
@@ -200,9 +205,9 @@ public:
         this->parseInput(inputFilePath);
     }
 
-    int solve()
+    int solvePart1()
     {
-        int shortestDistanceToOrigin = INT_MAX;
+        int shortestDistanceToOrigin = INT32_MAX;
         Point intersectionPoint;
         for (const Line &l1 : wires[0].data)
             for (const Line &l2 : wires[1].data)
@@ -217,6 +222,36 @@ public:
                 }
             }
         return shortestDistanceToOrigin;
+    }
+
+    int solvePart2()
+    {
+        int shortestStepDistance = INT32_MAX;
+        Point intersectionPoint;
+        int previousLinesStepDistance1 = 0;
+        for (const Line &l1 : wires[0].data)
+        {
+            int previousLinesStepDistance2 = 0;
+            for (const Line &l2 : wires[1].data)
+            {
+                if (l1.intersects(l2, intersectionPoint))
+                {
+                    int totalStepDistance1 = previousLinesStepDistance1 + l1.start.manhattanDistToPoint(intersectionPoint);
+                    int totalStepDistance2 = previousLinesStepDistance2 + l2.start.manhattanDistToPoint(intersectionPoint);
+                    int totalStepDistance = totalStepDistance1 + totalStepDistance2;
+                    if (totalStepDistance < shortestStepDistance)
+                    {
+                        shortestStepDistance = totalStepDistance;
+                    }
+                }
+
+                previousLinesStepDistance2 += l2.length;
+            }
+
+            previousLinesStepDistance1 += l1.length;
+        }
+
+        return shortestStepDistance;
     }
 
 private:
@@ -278,6 +313,9 @@ int main(int argc, char **argv)
     }
 
     std::string inputFilePath = argv[1];
-    cout << "Solution:\n " << Solution(inputFilePath).solve() << endl;
+    Solution sol(inputFilePath);
+    cout << "Solution:\n"
+         << "Part 1: " << sol.solvePart1() << "\n"
+         << "Part 2: " << sol.solvePart2() << endl;
     return EXIT_SUCCESS;
 }
