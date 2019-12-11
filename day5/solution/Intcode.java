@@ -68,8 +68,8 @@ public class Intcode {
         int destination = mInstructionArray[position + 3];
 
         // Actual operand values depend on mode
-        int operand1 = modes[0] == 0 ? mInstructionArray[param1] : param1;
-        int operand2 = modes[1] == 0 ? mInstructionArray[param2] : param2;
+        int operand1 = modes[0] == MODE_POSITION ? mInstructionArray[param1] : param1;
+        int operand2 = modes[1] == MODE_POSITION ? mInstructionArray[param2] : param2;
 
         mInstructionArray[destination] = operand1 + operand2;
     }
@@ -80,8 +80,8 @@ public class Intcode {
         int destination = mInstructionArray[position + 3];
 
         // Actual operand values depend on mode
-        int operand1 = modes[0] == 0 ? mInstructionArray[param1] : param1;
-        int operand2 = modes[1] == 0 ? mInstructionArray[param2] : param2;
+        int operand1 = modes[0] == MODE_POSITION ? mInstructionArray[param1] : param1;
+        int operand2 = modes[1] == MODE_POSITION ? mInstructionArray[param2] : param2;
 
         mInstructionArray[destination] = operand1 * operand2;
     }
