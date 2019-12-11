@@ -4,3 +4,6 @@
 # C++ artifacts
 build
 debug
+
+# Java artifacts
+*.class
