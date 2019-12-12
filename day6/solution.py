@@ -32,6 +32,15 @@ class Object:
         else:
             self.orbitCount = 0
 
+    def getAllAncestors(self) -> List['Object']:
+        # Get a list of the object's ancestors, ordered top-down
+        obj = self
+        res = []
+        while obj.parent is not None:
+            res.append(obj.parent)
+            obj = obj.parent
+        return res[::-1]
+
     def __repr__(self):
         parentName = self.parent.name if self.parent else None
         childrenNames = ','.join([child.name for child in self.children])
@@ -52,20 +61,8 @@ class Solution:
         return totalOrbitCount
 
     def solvePart2(self) -> int:
-        santaObj = self.objects[SANTA_NAME]
-        yourObj = self.objects[YOUR_NAME]
-
-        # Get a list of the object's ancestors, ordered from COM
-        # to the object
-        def getAllAncestors(obj: Object) -> List[Object]:
-            res = []
-            while obj.parent is not None:
-                res.append(obj.parent)
-                obj = obj.parent
-            return res[::-1]
-
-        santaAncestorList = getAllAncestors(santaObj)
-        yourAncestorList = getAllAncestors(yourObj)
+        santaAncestorList = self.objects[SANTA_NAME].getAllAncestors()
+        yourAncestorList = self.objects[YOUR_NAME].getAllAncestors()
 
         # Determine the last common ancestor of both
         # and count the distance from that ancestor to both.
