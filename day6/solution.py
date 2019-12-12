@@ -37,7 +37,9 @@ class Object:
 
 class Solution:
     def __init__(self, inputFilePath: str):
+        # Dictionary containing all the registered objects
         self.objects = {COM_NAME: Object(COM_NAME, None)}
+
         self._parseInput(inputFilePath)
 
     def solvePart1(self) -> int:
@@ -49,6 +51,7 @@ class Solution:
     def _parseInput(self, inputFilePath: str) -> None:
         with open(inputFilePath, 'r') as fd:
             for line in fd:
+                # Register orbiter (and also orbitee if required)
                 parentName, childName = line.rstrip('\n').split(')')
                 if parentName not in self.objects:
                     self._registerNewObject(parentName, None)
