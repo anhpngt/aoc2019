@@ -1,9 +1,12 @@
 import argparse
 from collections import deque
 from typing import Deque
+from typing import List
 from typing import Optional
 
 COM_NAME = 'COM'
+SANTA_NAME = 'SAN'
+YOUR_NAME = 'YOU'
 
 
 class Object:
@@ -48,6 +51,32 @@ class Solution:
             totalOrbitCount += obj.orbitCount
         return totalOrbitCount
 
+    def solvePart2(self) -> int:
+        santaObj = self.objects[SANTA_NAME]
+        yourObj = self.objects[YOUR_NAME]
+
+        # Get a list of the object's ancestors, ordered from COM
+        # to the object
+        def getAllAncestors(obj: Object) -> List[Object]:
+            res = []
+            while obj.parent is not None:
+                res.append(obj.parent)
+                obj = obj.parent
+            return res[::-1]
+
+        santaAncestorList = getAllAncestors(santaObj)
+        yourAncestorList = getAllAncestors(yourObj)
+
+        # Determine the last common ancestor of both
+        # and count the distance from that ancestor to both.
+        lastCommonAncestorIdx = -1
+        for santaAncestor, yourAncestor in zip(santaAncestorList, yourAncestorList):
+            if santaAncestor == yourAncestor:
+                lastCommonAncestorIdx += 1
+            else:
+                break
+        return (len(santaAncestorList) - lastCommonAncestorIdx - 1) + (len(yourAncestorList) - lastCommonAncestorIdx - 1)
+
     def _parseInput(self, inputFilePath: str) -> None:
         with open(inputFilePath, 'r') as fd:
             for line in fd:
@@ -79,3 +108,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     sol = Solution(args.input)
     print(f'Part 1 Solution: {sol.solvePart1()}')
+    print(f'Part 2 Solution: {sol.solvePart2()}')
