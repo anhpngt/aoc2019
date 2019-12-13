@@ -12,13 +12,13 @@ public class AmplifierSystem {
     }
 
     public int run(int[] phaseSettings) {
-        if(phaseSettings.length != mAmplifierNumber) {
+        if (phaseSettings.length != mAmplifierNumber) {
             throw new RuntimeException("Invalid length of phase settings.");
         }
 
         int signal = INPUT_VALUE;
-        for(int i = 0; i < mAmplifierNumber; i++) {
-            int[] amplifierInputs = {phaseSettings[i], signal};
+        for (int i = 0; i < mAmplifierNumber; i++) {
+            int[] amplifierInputs = { phaseSettings[i], signal };
             Intcode amplifier = new Intcode(mInstructionArray, amplifierInputs);
             signal = amplifier.run();
         }
