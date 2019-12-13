@@ -27,12 +27,22 @@ public class Intcode {
 
     public Intcode(int[] instructionArray, int[] inputs) {
         mInstructionArray = instructionArray;
-        mInputs = new LinkedList<>();
-        for(int e: inputs) {
-            mInputs.add(e);
+        provideInput(inputs);
+        initializeStates();
+    }
+
+    public int getCurrentOpcode() {
+        return mOperation.opcode();
+    }
+
+    public void provideInput(int[] inputs) {
+        if (mInputs == null) {
+            mInputs = new LinkedList<>();
         }
 
-        initializeStates();
+        for (int e : inputs) {
+            mInputs.add(e);
+        }
     }
 
     public int run() {
@@ -41,6 +51,22 @@ public class Intcode {
             mFunc.get(mOperation.opcode()).run();
 
             mOperation = determineNextOperation();
+        }
+
+        return mOutput;
+    }
+
+    public int runUntilOutput() {
+        mOperation = determineNextOperation();
+        int opcode = mOperation.opcode();
+        while (opcode != OP_HALT) {
+            mFunc.get(opcode).run();
+            if (opcode == OP_OUTPUT) {
+                return mOutput;
+            }
+
+            mOperation = determineNextOperation();
+            opcode = mOperation.opcode();
         }
 
         return mOutput;

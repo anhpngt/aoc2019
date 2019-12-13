@@ -13,16 +13,36 @@ public class Solution {
         String[] strInstructionArray = Parser.parseInputFile(inputFilePath);
         int[] instructionArray = Arrays.asList(strInstructionArray).stream().mapToInt(Integer::parseInt).toArray();
 
+        System.out.println("Part 1 Solution: " + solvePart1(instructionArray));
+        System.out.println("Part 2 Solution: " + solvePart2(instructionArray));
+    }
+
+    private static int solvePart1(int[] instructionArray) {
         int maxThrusterSignal = 0;
-        for (int[] phaseSetting : generatePermutation(new int[] { 0, 1, 2, 3, 4 })) {
-            AmplifierSystem amps = new AmplifierSystem(instructionArray, 5);
+        int[] phaseSettingArray = new int[] { 0, 1, 2, 3, 4 };
+        for (int[] phaseSetting : generatePermutation(phaseSettingArray)) {
+            AmplifierSystem amps = new AmplifierSystem(instructionArray, phaseSettingArray.length);
             int thrusterSignal = amps.run(phaseSetting);
-            if(thrusterSignal > maxThrusterSignal) {
+            if (thrusterSignal > maxThrusterSignal) {
                 maxThrusterSignal = thrusterSignal;
             }
         }
-        
-        System.out.println(maxThrusterSignal);
+
+        return maxThrusterSignal;
+    }
+
+    private static int solvePart2(int[] instructionArray) {
+        int maxThrusterSignal = 0;
+        int[] phaseSettingArray = new int[] { 5, 6, 7, 8, 9 };
+        for (int[] phaseSetting : generatePermutation(phaseSettingArray)) {
+            AmplifierSystem amps = new AmplifierSystem(instructionArray, phaseSettingArray.length);
+            int thrusterSignal = amps.runWithFeedback(phaseSetting);
+            if (thrusterSignal > maxThrusterSignal) {
+                maxThrusterSignal = thrusterSignal;
+            }
+        }
+
+        return maxThrusterSignal;
     }
 
     private static Vector<int[]> generatePermutation(int[] arr) {
