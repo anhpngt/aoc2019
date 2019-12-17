@@ -1,6 +1,5 @@
 import argparse
-from math import gcd
-from math import sqrt
+import math
 from typing import Dict
 from typing import List
 
@@ -20,14 +19,21 @@ class Point:
         return self.x == o.x and self.y == o.y
 
     def distance(self):
-        # Returns Euclidean point-to-origin distance
-        return sqrt(self.x ** 2 + self.y ** 2)
+        """Returns Euclidean point-to-origin distance"""
+        return math.sqrt(self.x ** 2 + self.y ** 2)
 
     def isAt(self, x: int, y: int) -> bool:
         return self.x == x and self.y == y
 
     def getLineOfSight(self) -> 'LineOfSight':
         return LineOfSight(self.x, self.y)
+
+    def getAngleFrom(self, o: 'Point') -> float:
+        """Return the angle w.r.t `o`, clockwise-positive,
+        upward-origin (aligns with negative y-direction).
+        The value ranges from 0 to 2 Pi."""
+        val = math.atan2(self.x - o.x, o.y - self.y)
+        return val if val >= 0 else val + 2 * math.pi
 
     def offsetFrom(self, x: int, y: int) -> 'Point':
         # Returns Point which considers (x, y) as the origin instead
@@ -46,7 +52,7 @@ class LineOfSight:
             self.x = 1 if x > 0 else -1
         else:
             # both x, y != 0
-            xygcd = gcd(x, y)
+            xygcd = math.gcd(x, y)
             self.x = x // xygcd
             self.y = y // xygcd
 
@@ -72,6 +78,12 @@ class StarMap:
         return self.countAsteroidDetectedAtPoint(asteroid.x, asteroid.y)
 
     def countAsteroidDetectedAtPoint(self, x: int, y: int) -> int:
+        return len(self.getAsteroidDetectedAtPoint(x, y))
+
+    def getAsteroidDetectedAt(self, asteroid: 'Point') -> List[Point]:
+        return self.getAsteroidDetectedAtPoint(asteroid.x, asteroid.y)
+
+    def getAsteroidDetectedAtPoint(self, x: int, y: int) -> List[Point]:
         # A collection keeping all the asteroids that can be detected
         # and their line-of-sight "angles"
         detected = {}       # type: Dict[LineOfSight, Point]
@@ -95,7 +107,13 @@ class StarMap:
             # This may override another asteroid in the same line-of-sight
             detected[asteroidLoS] = asteroidFromPoint
 
-        return len(detected)
+        # Remove the introduced offset from the detected asteroids
+        # and return the list
+        return [ast.offsetFrom(-x, -y) for ast in detected.values()]
+
+    def removeAsteroids(self, asteroids: List[Point]) -> None:
+        for asteroid in asteroids:
+            self.allAsteroids.remove(asteroid)
 
     @classmethod
     def parseInputFile(cls, inputFilePath: str) -> 'StarMap':
@@ -116,6 +134,30 @@ class Solution:
             for asteroid in self.starmap.allAsteroids
         )
 
+    def solvePart2(self, stationAsteroid: Point, betNumber: int) -> int:
+        # Remove the chosen asteroid
+        self.starmap.removeAsteroids([stationAsteroid])
+
+        # Iteratively
+        count = 0
+        while self.starmap:
+            # The asteroids being destroy at current laser rotation
+            detectedAsteroids = self.starmap.getAsteroidDetectedAt(stationAsteroid)
+
+            # Skip to next rotation if betNumber is not within current rotation
+            if betNumber > count + len(detectedAsteroids):
+                count += len(detectedAsteroids)
+                self.starmap.removeAsteroids(detectedAsteroids)
+                continue
+
+            # Sort the detected asteroid according to their line of sight
+            sortedAsteroids = sorted(detectedAsteroids,
+                                     key=lambda a: a.getAngleFrom(stationAsteroid))
+            bettedAsteroid = sortedAsteroids[betNumber - count - 1]
+            return bettedAsteroid.x * 100 + bettedAsteroid.y
+
+        raise RuntimeError('Failed to solve for answer')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('Solution to day 9\'s problem')
@@ -124,3 +166,5 @@ if __name__ == "__main__":
 
     sol = Solution(args.input)
     print(f'Part 1 solution: {sol.solvePart1()}')
+    # Part 1 solution is asteroid at (x=22,y=19)
+    print(f'Part 2 solution: {sol.solvePart2(Point(22, 19), 200)}')
