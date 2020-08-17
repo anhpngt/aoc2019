@@ -16,6 +16,9 @@ public class Painter {
         mPaintedLocations = new HashMap<>();
     }
 
+    /**
+     * Starts painting.
+     */
     public void run() {
         while (!mIntcode.isHalt()) {
             // Get input value based on color of current panel
@@ -37,6 +40,9 @@ public class Painter {
         }
     }
 
+    /**
+     * @return number of panels painted at least once.
+     */
     public long getPaintedPanelCount() {
         return mPaintedLocations.size();
     }

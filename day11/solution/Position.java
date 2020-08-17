@@ -3,6 +3,9 @@ package solution;
 class Position {
     public int x, y;
 
+    /**
+     * Coordinates are x-right, y-up.
+     */
     public Position(int x_, int y_) {
         this.x = x_;
         this.y = y_;
