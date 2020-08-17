@@ -1,5 +1,6 @@
 import argparse
 import re
+from copy import deepcopy
 from itertools import combinations
 from typing import List
 
@@ -22,23 +23,23 @@ class Gravity(Coordinates):
 
 
 class Velocity(Coordinates):
+    def __repr__(self) -> str:
+        return f'vel:{super().__repr__()}'
+
     def accelerate(self, gravity: Gravity) -> None:
         self.x += gravity.x
         self.y += gravity.y
         self.z += gravity.z
 
-    def __repr__(self) -> str:
-        return f'vel:{super().__repr__()}'
-
 
 class Position(Coordinates):
+    def __repr__(self) -> str:
+        return f'pos:{super().__repr__()}'
+
     def move(self, velocity: Velocity) -> None:
         self.x += velocity.x
         self.y += velocity.y
         self.z += velocity.z
-
-    def __repr__(self) -> str:
-        return f'pos:{super().__repr__()}'
 
 
 class Star:
@@ -78,6 +79,14 @@ class Star:
         """Get star's total energy."""
         return self._potentialEnergy() * self._kineticEnergy()
 
+    def isAtPosition(self, position: Position) -> bool:
+        return self.position.x == position.x and \
+            self.position.y == position.y and \
+            self.position.z == position.z
+
+    def isMoving(self) -> int:
+        return bool(self.velocity.x or self.velocity.y or self.velocity.z)
+
     def _potentialEnergy(self) -> int:
         return abs(self.position.x) + abs(self.position.y) + abs(self.position.z)
 
@@ -88,13 +97,19 @@ class Star:
 class System:
     def __init__(self, requiredSteps: int) -> None:
         self.stars: List[Star] = []
+        self.starsIntial: List[Star] = []
         self.requiredSteps = requiredSteps
 
     def __repr__(self) -> str:
         return '\n'.join(star.__repr__() for star in self.stars)
 
     def addStar(self, star: Star) -> None:
-        self.stars.append(star)
+        self.stars.append(deepcopy(star))
+        self.starsIntial.append(deepcopy(star))
+
+    def reset(self) -> None:
+        # Reset the whole system
+        self.stars = deepcopy(self.starsIntial)
 
     def runSimulation(self) -> None:
         for i in range(self.requiredSteps):
@@ -102,6 +117,16 @@ class System:
 
     def getTotalEnergy(self) -> int:
         return sum(s.energy() for s in self.stars)
+
+    def getSystemCycle(self) -> int:
+        self._updateSystemByOneStep()
+        count = 1
+        while self._isSystemMoving() or not self._isSystemAtInitialState():
+            self._updateSystemByOneStep()
+            count += 1
+            if count % 10000 == 0:
+                print(f'Reach step {count}')
+        return count
 
     def _updateSystemByOneStep(self) -> None:
         # Clear gravitational values to recompute
@@ -116,6 +141,12 @@ class System:
         for star in self.stars:
             star.updateVelocity()
             star.updatePosition()
+
+    def _isSystemAtInitialState(self) -> bool:
+        return all(a.isAtPosition(b.position) for a, b in zip(self.stars, self.starsIntial))
+
+    def _isSystemMoving(self) -> bool:
+        return any(star.isMoving() for star in self.stars)
 
 
 class Solution:
@@ -143,6 +174,14 @@ class Solution:
         self.system.runSimulation()
         return self.system.getTotalEnergy()
 
+    def solvePart2(self) -> int:
+        """
+        Calculates the number of steps when the system first returns to the
+        initial state, where the system stands still momentarily.
+        """
+        self.system.reset()
+        return self.system.getSystemCycle()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Solution to day 12's problem")
@@ -152,3 +191,4 @@ if __name__ == "__main__":
 
     sol = Solution(args.file, args.steps)
     print(f'Part 1: {sol.solvePart1()}')
+    print(f'Part 2: {sol.solvePart2()}')
