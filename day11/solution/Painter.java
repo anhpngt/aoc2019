@@ -48,6 +48,7 @@ public class Painter {
             mCurrentPosition.moveForward(mCurrentDirection);
             setMapRange();
         }
+        System.out.println();
     }
 
     /**
