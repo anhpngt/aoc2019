@@ -12,12 +12,12 @@ public class Solution {
         String[] strInstructionArray = Parser.parseInputFile(inputFilePath);
         long[] instructionArray = Arrays.asList(strInstructionArray).stream().mapToLong(Long::parseLong).toArray();
 
-        solve(instructionArray);
+        solvePart1(instructionArray);
     }
 
-    private static void solve(long[] instructionArray) {
+    private static void solvePart1(long[] instructionArray) {
         Painter painter = new Painter(instructionArray);
         painter.run();
-        System.out.println(painter.getPaintedPanelCount());
+        System.out.println("Part 1: " + painter.getPaintedPanelCount());
     }
 }
