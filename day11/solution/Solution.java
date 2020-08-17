@@ -13,11 +13,21 @@ public class Solution {
         long[] instructionArray = Arrays.asList(strInstructionArray).stream().mapToLong(Long::parseLong).toArray();
 
         solvePart1(instructionArray);
+        solvePart2(instructionArray);
     }
 
     private static void solvePart1(long[] instructionArray) {
         Painter painter = new Painter(instructionArray);
         painter.run();
         System.out.println("Part 1: " + painter.getPaintedPanelCount());
+    }
+
+    private static void solvePart2(long[] instructionArray) {
+        Painter painter = new Painter(instructionArray);
+        painter.setFirstPanelWhite();
+        painter.run();
+        
+        System.out.println("Part 2:");
+        painter.printPaintedMessage();
     }
 }
