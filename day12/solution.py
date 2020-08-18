@@ -108,14 +108,16 @@ class System:
         self.starsIntial.append(deepcopy(star))
 
     def reset(self) -> None:
-        # Reset the whole system
+        """Reset the whole system to its original states."""
         self.stars = deepcopy(self.starsIntial)
 
     def runSimulation(self) -> None:
+        """Run the simulation with the specified number of steps."""
         for i in range(self.requiredSteps):
             self._updateSystemByOneStep()
 
     def getTotalEnergy(self) -> int:
+        """Returns total energy of the system."""
         return sum(s.energy() for s in self.stars)
 
     def getSystemCycle(self) -> int:
@@ -175,10 +177,6 @@ class Solution:
         return self.system.getTotalEnergy()
 
     def solvePart2(self) -> int:
-        """
-        Calculates the number of steps when the system first returns to the
-        initial state, where the system stands still momentarily.
-        """
         self.system.reset()
         return self.system.getSystemCycle()
 
