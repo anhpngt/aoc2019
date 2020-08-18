@@ -69,7 +69,7 @@ public class Painter {
         for (int y = mYMax; y >= mYMin; y--) {
             char[] currentMessageLine = new char[messageWidth];
             for (int x = mXMin; x <= mXMax; x++) {
-                currentMessageLine[x + xOffset] = mPaintedLocations.getOrDefault(new Position(x, y), 0) == 1 ? '*'
+                currentMessageLine[x - xOffset] = mPaintedLocations.getOrDefault(new Position(x, y), 0) == 1 ? '*'
                         : ' ';
             }
             System.out.println(new String(currentMessageLine));
