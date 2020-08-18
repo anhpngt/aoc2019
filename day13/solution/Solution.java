@@ -13,11 +13,19 @@ public class Solution {
         long[] instructionArray = Arrays.asList(strInstructionArray).stream().mapToLong(Long::parseLong).toArray();
 
         solvePart1(instructionArray);
+        solvePart2(instructionArray);
     }
 
     private static void solvePart1(long[] instructionArray) {
         Screen screen = new Screen(instructionArray);
         screen.startUp();
         System.out.println("Part 1: " + screen.countTileNumber(2));
+    }
+
+    private static void solvePart2(long[] instructionArray) {
+        instructionArray[0] = 2;
+        Screen screen = new Screen(instructionArray);
+        screen.startUpAndPlay();
+        System.out.println("Part 2: " + screen.getScore());
     }
 }
