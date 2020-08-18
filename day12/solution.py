@@ -2,9 +2,15 @@ import argparse
 import re
 from copy import deepcopy
 from itertools import combinations
+from math import gcd
 from typing import List
 
 INPUT_REGEXP = re.compile(r'^<x=(-?[0-9]+),[ ]*y=(-?[0-9]+),[ ]*z=(-?[0-9]+)>$')
+
+
+def lcm(a: int, b: int) -> int:
+    """Find least common multiple of 2 integers"""
+    return a * b // gcd(a, b)
 
 
 class Coordinates:
@@ -121,14 +127,24 @@ class System:
         return sum(s.energy() for s in self.stars)
 
     def getSystemCycle(self) -> int:
-        self._updateSystemByOneStep()
-        count = 1
-        while self._isSystemMoving() or not self._isSystemAtInitialState():
-            self._updateSystemByOneStep()
+        """
+        Speed up the process by compute the cycle for each dimension, then
+        return their least common multiple.
+        """
+        count = 0   # Steps count
+        xCycle = yCycle = zCycle = 0    # Cycle on each dimension
+        while not (xCycle and yCycle and zCycle):
             count += 1
-            if count % 10000 == 0:
-                print(f'Reach step {count}')
-        return count
+            self._updateSystemByOneStep()
+
+            if not xCycle and self._isSystemAtInitialStateOnDimension('x'):
+                xCycle = count
+            if not yCycle and self._isSystemAtInitialStateOnDimension('y'):
+                yCycle = count
+            if not zCycle and self._isSystemAtInitialStateOnDimension('z'):
+                zCycle = count
+
+        return lcm(xCycle, lcm(yCycle, zCycle))
 
     def _updateSystemByOneStep(self) -> None:
         # Clear gravitational values to recompute
@@ -144,11 +160,16 @@ class System:
             star.updateVelocity()
             star.updatePosition()
 
-    def _isSystemAtInitialState(self) -> bool:
-        return all(a.isAtPosition(b.position) for a, b in zip(self.stars, self.starsIntial))
-
-    def _isSystemMoving(self) -> bool:
-        return any(star.isMoving() for star in self.stars)
+    def _isSystemAtInitialStateOnDimension(self, dimension: str) -> bool:
+        """
+        Checks whether, on the specified dimension, the system has returned to
+        its original state.
+        """
+        return all(
+            star.position.__dict__[dimension] == starInit.position.__dict__[dimension]
+            and star.velocity.__dict__[dimension] == starInit.velocity.__dict__[dimension]
+            for star, starInit in zip(self.stars, self.starsIntial)
+        )
 
 
 class Solution:
