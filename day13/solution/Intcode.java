@@ -22,6 +22,7 @@ public class Intcode {
 
     private Vector<Long> mInstructionArray;
     private LinkedList<Long> mInputs;
+    private long mDefaultInput;
     private long mOutput;
     private HashMap<Integer, Runnable> mFunc;
 
@@ -58,6 +59,13 @@ public class Intcode {
         for (long e : inputs) {
             mInputs.add(e);
         }
+    }
+
+    /**
+     * Set the default input in case no inputs are available.
+     */
+    public void setDefaultInput(long input) {
+        mDefaultInput = input;
     }
 
     /**
@@ -105,6 +113,7 @@ public class Intcode {
     private void initializeStates() {
         mPosition = 0;
         mRelativeBase = 0;
+        mDefaultInput = 0;
 
         mFunc = new HashMap<>();
         mFunc.put(OP_ADD, () -> this.opAdd());
@@ -202,7 +211,11 @@ public class Intcode {
     private void opInput() {
         final int paramNumber = 1;
         long[] params = getParameters(paramNumber, true);
-        setInstructionAtIndex(mInputs.pollFirst(), params[0]);
+        if (mInputs.isEmpty()) {
+            setInstructionAtIndex(mDefaultInput, params[0]);
+        } else {
+            setInstructionAtIndex(mInputs.pollFirst(), params[0]);
+        }
         incrementInstructionPointer(paramNumber);
     }
 
